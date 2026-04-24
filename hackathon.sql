@@ -67,9 +67,9 @@ values
 
 -- Chuyến bay 'HN-PQ' vừa được tăng cường tàu bay lớn hơn, hãy tăng available_seats thêm 10 ghế và tăng ticket_price lên 5%.
 update flights 
-set available_seats = 30 and ticket_price = ticket_price * 1.05
-where route_name like 'HN-PQ%';
-select * from flights;
+set available_seats = available_seats + 10, ticket_price = ticket_price * 1.05
+where route_name = 'HN-PQ';
+
 -- Cập nhật số điện thoại của hành khách có passenger_id = 'P03' thành '0999999999'.
 update passengers 
 set phone = '0999999999'
@@ -95,9 +95,10 @@ from bookings
 order by booking_date desc;
 
 -- Lấy ra 3 chuyến bay có giá vé (ticket_price) đắt nhất trong hệ thống.
-select route_name, ticket_price 
+select *
 from flights
-where max(ticket_price);
+order by ticket_price desc
+limit 3;
 
 -- Hiển thị danh sách route_name, available_seats từ bảng Flights, bỏ qua 2 chuyến bay đầu tiên và lấy 2 chuyến bay tiếp theo (Phân trang).
 select route_name, available_seats
@@ -106,12 +107,14 @@ limit 2 offset 2;
 
 -- Hiển thị danh sách gồm: booking_id, full_name (của hành khách), route_name (của chuyến bay) và booking_date. 
 -- Chỉ lấy những vé đang có trạng thái 'Booked'.
-select booking_id, booking_date
+select b.booking_id, p.full_name, f.route_name, b.booking_date
 from bookings b
-join passengers p on b.passenger_id = p.full_name
-join flights f on b.flight_id = f.route_name
-where booking_status = 'Booked';
+join passengers p on b.passenger_id = p.passenger_id
+join flights f on b.flight_id = f.flight_id
+where b.booking_status = 'Booked';
 
 -- Liệt kê tất cả các Hãng hàng không (Airlines) và tên chặng bay (route_name) thuộc hãng đó. 
 -- Hiển thị cả những hãng chưa có chuyến bay nào khai thác.
-
+select a.airline_name, f.route_name
+from airlines a
+left join flights f on a.airline_id = f.airline_id;
